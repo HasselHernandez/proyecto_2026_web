@@ -7,6 +7,7 @@ import Productos from "./views/Productos";
 import Login from "./views/Login";
 import RutaProtegida from "./components/rutas/RutaProtegida";
 import Pagina404 from "./views/Pagina404";
+import "./App.css";
 
 
 const App = () => {

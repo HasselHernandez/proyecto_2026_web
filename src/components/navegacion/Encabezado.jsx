@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
 import logo from "../../assets/logo.png";
-import { supabase } from "../../database/supabaseconfig";
+import { supabase } from "../../database/supabaseconfig"
 
 
 
