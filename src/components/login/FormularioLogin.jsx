@@ -11,8 +11,7 @@ return (
 
     {error && <Alert variant="danger">{error}</Alert>}
 
-    <Form onSubmit={handleSubmit}>
-
+    <Form>
       <Form.Group className="mb-3" controlId="usuario">
         <Form.Label>Usuario</Form.Label>
         <Form.Control
@@ -35,7 +34,7 @@ return (
         />
       </Form.Group>
 
-      <Button variant="primary" type="submit" className="w-100">
+      <Button variant="primary"  className="w-100" onClick={iniciarSesion}>
         Iniciar Sesión
       </Button>
 

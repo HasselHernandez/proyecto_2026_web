@@ -114,7 +114,7 @@ if (esLogin) {
           <hr />
 
           {/* Ícono cerrar sesión en barra superior */}
-          {!mostrarMenu ? null : (
+          {mostrarMenu ? null : (
             <Nav.Link
               onClick={cerrarSesion}
               className={mostrarMenu ? "color-texto-marca" : "text-white"}
