@@ -7,11 +7,11 @@ const Inicio = () => {
     <Container className="mt-3">
       <Row className="align-items-center">
         <Col>
-          <h2 className="mb-0 use-full me-2">Inicio</h2>
+          <h2><i className="bi-house-fill me-2"></i> Inicio</h2>
         </Col>
       </Row>
     </Container>
   );
 };
-
+  
 export default Inicio;

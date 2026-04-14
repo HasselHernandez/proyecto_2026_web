@@ -14,7 +14,7 @@ const App = () => {
   return (
     <Router>
       <Encabezado />
-      <main className="margen-superior">
+      <main className="margen-superior-main">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<RutaProtegida><Inicio /></RutaProtegida>} />
