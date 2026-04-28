@@ -28,6 +28,22 @@ const Categorias = () => {
     descripcion_categoria: "",
   });
 
+
+  const abrirModalEdicion = (categoria) => {
+    setCategoriaEditar({
+      id_categoria: categoria.id_categoria,
+      nombre_categoria: categoria.nombre_categoria,
+      descripcion_categoria: categoria.descripcion_categoria,
+    });
+    setMostrarModalEdicion(true);
+  };
+
+  const abrirModalEliminacion = (categoria) => {
+    setCategoriaAEliminar(categoria);
+    setMostrarModalEliminacion(true);
+  };
+
+
   const cargarCategorias = async () => {
     try {
       setCargando(true);
@@ -44,14 +60,7 @@ const Categorias = () => {
         });
         return;
       }
-      setCategorias(
-        (data || []).map((item) => ({
-          ...item,
-          descripcion_categoria:
-            item.descripcion_categoria ?? item.descripcion ?? "",
-          nombre_categoria: item.nombre_categoria ?? item.nombre ?? "",
-        })),
-      );
+      setCategorias(data || []);
     } catch (err) {
       console.error("Excepción al cargar categorías:", err.message);
       setToast({
@@ -68,20 +77,9 @@ const Categorias = () => {
     cargarCategorias();
   }, []);
 
-  const abrirModalEdicion = (categoria) => {
-    setCategoriaEditar({
-      id_categoria: categoria.id_categoria,
-      nombre_categoria: categoria.nombre_categoria,
-      descripcion_categoria:
-        categoria.descripcion_categoria ?? categoria.descripcion ?? "",
-    });
-    setMostrarModalEdicion(true);
-  };
 
-  const abrirModalEliminacion = (categoria) => {
-    setCategoriaAEliminar(categoria);
-    setMostrarModalEliminacion(true);
-  };
+
+
 
   const manejoCambioInputEdicion = (e) => {
     const { name, value } = e.target;
@@ -261,13 +259,14 @@ const Categorias = () => {
           <Button onClick={() => setMostrarModal(true)} size="md">
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">
-               Nueva Categoría
-              </span>
+              Nueva Categoría
+            </span>
           </Button>
         </Col>
       </Row>
 
       <hr />
+
 
       {/* Spinner mientras se cargan las categorías */}
       {cargando && (
@@ -278,16 +277,6 @@ const Categorias = () => {
           </Col>
         </Row>
       )}
-      
-<Row>
-<Col xs={12} className="d-lg-none">
-  <TarjetaCategoria
-    categorias={categorias}
-    abrirModalEdicion={abrirModalEdicion}
-    abrirModalEliminacion={abrirModalEliminacion}
-  />
-</Col>
-      </Row>
 
       {/* Lista de categorías cargadas */}
       {!cargando && categorias.length > 0 && (
@@ -301,6 +290,16 @@ const Categorias = () => {
           </Col>
         </Row>
       )}
+
+      <Row>
+        <Col xs={12} className="d-lg-none">
+          <TarjetaCategoria
+            categorias={categorias}
+            abrirModalEdicion={abrirModalEdicion}
+            abrirModalEliminacion={abrirModalEliminacion}
+          />
+        </Col>
+      </Row>
 
       {/* Modal de Registro */}
       <ModalRegistroCategoria
