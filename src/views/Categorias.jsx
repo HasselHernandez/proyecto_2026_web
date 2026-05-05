@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
+
 import ModalRegistroCategoria from "../components/categorias/ModalRegistroCategoria";
 import ModalEdicionCategoria from "../components/categorias/ModalEdicionCategoria";
 import ModalEliminacionCategoria from "../components/categorias/ModalEliminacionCategoria";
@@ -322,6 +323,8 @@ const Categorias = () => {
           />
         </Col>
       </Row>
+
+      
 
       {/* Mensaje de no coincidencias solo cuando hay búsqueda y no hay resultados */}
       {!cargando && textoBusqueda.trim() && categoriasFiltradas.length === 0 && (
