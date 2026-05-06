@@ -52,10 +52,17 @@ const Productos = () => {
 
   const manejoCambioInputEdicion = (e) => {
     const { name, value } = e.target;
-    setProductoEditar((prev) => ({
-      ...prev,
-      [name]: value,
+    setProductoEditar((prev) => ({...prev,[name]: value,
     }));
+  };
+
+  const manejoCambioArchivoActualizar = (e) => {
+    const archivo = e.target.files[0]; 
+    if (archivo && archivo.type.startsWith("image/")) {
+      setProductoEditar((prev) => ({ ...prev, archivo }));
+    } else {
+      alert("Selecciona una imagen válida (JPG, PNG, etc.)");
+    }
   };
 
   const manejoCambioInput = (e) => {
@@ -117,61 +124,76 @@ const Productos = () => {
   };
 
   const actualizarProducto = async () => {
-    try {
-      if (
-        !productoEditar.nombre_producto.trim() ||
-        !productoEditar.descripcion_producto.trim() ||
-        !productoEditar.categoria_producto ||
-        !productoEditar.precio_venta
-      ) {
-        setToast({
-          mostrar: true,
-          mensaje: "Debe llenar todos los campos.",
-          tipo: "advertencia",
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from("productos")
-        .update({
-          nombre_producto: productoEditar.nombre_producto,
-          descripcion_producto: productoEditar.descripcion_producto,
-          categoria_producto: productoEditar.categoria_producto,
-          precio_venta: parseFloat(productoEditar.precio_venta),
-        })
-        .eq("id_producto", productoEditar.id_producto)
-        .select();
-
-      if (error) {
-        console.error("Error al actualizar producto:", error.message);
-        setToast({
-          mostrar: true,
-          mensaje: "Error al actualizar producto.",
-          tipo: "error",
-        });
-        return;
-      }
-
-      setMostrarModalEdicion(false);
-
-      await cargarProductos();
-
+  try {
+    if (
+      !productoEditar.nombre_producto.trim() ||
+      !productoEditar.categoria_producto ||
+      !productoEditar.precio_venta
+    ) {
       setToast({
         mostrar: true,
-        mensaje: `Producto "${productoEditar.nombre_producto}" actualizado exitosamente.`,
-        tipo: "exito",
+        mensaje: "Completa los campos obligatorios",
+        tipo: "advertencia",
       });
-    } catch (err) {
-      console.error("Excepción al actualizar producto:", err.message);
-      setToast({
-        mostrar: true,
-        mensaje: "Error inesperado al actualizar producto.",
-        tipo: "error",
-      });
-      console.error("Error al actualizar producto:", err.message);
+      return;
     }
-  };
+
+    setMostrarModalEdicion(false);
+
+    let datosActualizados = {
+      nombre_producto: productoEditar.nombre_producto,
+      descripcion_producto: productoEditar.descripcion_producto || null,
+      categoria_producto: productoEditar.categoria_producto,
+      precio_venta: parseFloat(productoEditar.precio_venta),
+      url_imagen: productoEditar.url_imagen,
+    };
+
+    if (productoEditar.archivo) {
+      const nombreArchivo = `${Date.now()}_${productoEditar.archivo.name}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("imagenes_productos")
+        .upload(nombreArchivo, productoEditar.archivo);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("imagenes_productos")
+        .getPublicUrl(nombreArchivo);
+
+      datosActualizados.url_imagen = urlData.publicUrl;
+
+      if (productoEditar.url_imagen) {
+        const nombreAnterior = productoEditar.url_imagen.split("/").pop().split("?")[0];
+        await supabase.storage.from("imagenes_productos").remove([nombreAnterior]).catch(() => {});
+      }
+    }
+
+    const { error } = await supabase
+      .from("productos")
+      .update(datosActualizados)
+      .eq("id_producto", productoEditar.id_producto);
+
+    if (error) throw error;
+
+    await cargarProductos();
+
+    setProductoEditar({
+      id_producto: "",
+      nombre_producto: "",
+      descripcion_producto: "",
+      categoria_producto: "",
+      precio_venta: "",
+      url_imagen: "",
+      archivo: null,
+    });
+
+    setToast({ mostrar: true, mensaje: "Producto actualizado correctamente", tipo: "exito" });
+  } catch (err) {
+    console.error("Error al actualizar:", err);
+    setToast({ mostrar: true, mensaje: "Error al actualizar producto", tipo: "error" });
+  }
+};
 
   const eliminarProducto = async () => {
     if (!productoAEliminar) return;
@@ -336,16 +358,6 @@ const Productos = () => {
 
       <hr />
 
-      {/* Spinner mientras se cargan las categorías */}
-      {cargando && (
-        <Row className="text-center my-5">
-          <Col>
-            <Spinner animation="border" variant="success" size="lg" />
-            <p className="mt-3 text-muted">Cargando categorías...</p>
-          </Col>
-        </Row>
-      )}
-
       {/* Cuadro de búsqueda debajo de la línea divisoria */}
       <Row className="mb-4">
         <Col md={6} lg={5}>
@@ -357,6 +369,15 @@ const Productos = () => {
         </Col>
       </Row>
 
+      <Col xs={12} md={12} lg={12}>
+  {/* Spinner de carga de productos */}
+  {cargando && (
+    <div className="text-center my-5">
+      <Spinner animation="border" variant="success" size="lg" />
+      <p className="mt-3 text-muted">Cargando productos...</p>
+    </div>
+  )}
+</Col>
 
 
       {/* Mensaje de no coincidencias solo cuando hay búsqueda y no hay resultados */}
@@ -388,6 +409,7 @@ const Productos = () => {
           <Col xs={12} sm={12} md={12} className="d-lg-none">
             <TarjetaProductos
               productos={productosPaginados}
+              categorias={categorias}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
             />
@@ -395,6 +417,7 @@ const Productos = () => {
           <Col lg={12} className="d-none d-lg-block">
             <TablaProductos
               productos={productosPaginados}
+              categorias={categorias}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
             />
@@ -420,6 +443,7 @@ const Productos = () => {
         setMostrarModalEdicion={setMostrarModalEdicion}
         productoEditar={productoEditar}
         manejoCambioInputEdicion={manejoCambioInputEdicion}
+        manejoCambioArchivoActualizar={manejoCambioArchivoActualizar}
         actualizarProducto={actualizarProducto}
         categorias={categorias}
       />
