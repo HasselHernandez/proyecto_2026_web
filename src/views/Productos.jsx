@@ -107,19 +107,19 @@ const Productos = () => {
     cargarProductos();
   }, []);
 
-  const abrirModalEdicion = (categoria) => {
+  const abrirModalEdicion = (producto) => {
     setProductoEditar({
-      id_producto: categoria.id_producto,
-      nombre_producto: categoria.nombre_producto,
-      descripcion_producto: categoria.descripcion_producto,
-      categoria_producto: categoria.categoria_producto,
-      precio_venta: categoria.precio_venta,
+      id_producto: producto.id_producto,
+      nombre_producto: producto.nombre_producto,
+      descripcion_producto: producto.descripcion_producto,
+      categoria_producto: producto.categoria_producto,
+      precio_venta: producto.precio_venta,
     });
     setMostrarModalEdicion(true);
   };
 
-  const abrirModalEliminacion = (categoria) => {
-    setProductoAEliminar(categoria);
+  const abrirModalEliminacion = (producto) => {
+    setProductoAEliminar(producto);
     setMostrarModalEliminacion(true);
   };
 

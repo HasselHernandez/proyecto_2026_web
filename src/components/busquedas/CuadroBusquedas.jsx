@@ -10,7 +10,7 @@ const CuadroBusquedas = ({ textoBusqueda, manejarCambioBusqueda }) => {
       <Form.Control
         type="text"
         placeholder="Buscar..."
-        value={textoBusqueda}
+        value={textoBusqueda} 
         onChange={manejarCambioBusqueda}
       />
     </InputGroup>
